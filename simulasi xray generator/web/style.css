@@ -1,0 +1,73 @@
+/* === tombol burger === */
+#openBtn{
+  position:fixed; top:1.2rem; left:1.2rem;
+  z-index:1200;
+  width:48px; height:48px;
+  border:none; border-radius:12px;
+  background:#0a84ff;            /* biru cerah */
+  color:#fff; font-size:1.5rem;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+  transition:transform .2s, box-shadow .2s;
+}
+#openBtn:hover{
+  transform:scale(1.05);
+  box-shadow:0 6px 18px rgba(0,0,0,.5);
+}
+
+/* === sidebar container === */
+#sidebar{
+  position:fixed; top:0; left:0;
+  width:260px; height:100vh;
+  background:rgba(25,25,28,.9);
+  backdrop-filter:blur(14px);          /* efek kaca */
+  box-shadow:4px 0 16px rgba(0,0,0,.6);
+  transform:translateX(-100%);
+  transition:transform .35s cubic-bezier(.22,.7,.29,1);
+  z-index:1100;
+  display:flex; flex-direction:column;
+  font-family:'Urbanist',sans-serif;
+}
+
+/* muncul */
+#sidebar.show{ transform:translateX(0); }
+
+/* === header === */
+#sidebar header{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:1.1rem 1.3rem .7rem;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+#sidebar header h2{
+  margin:0; font-size:1.25rem; font-weight:600; color:#fff;
+  letter-spacing:.5px;
+}
+#closeBtn{
+  background:none; border:none; color:#fff;
+  font-size:1.6rem; cursor:pointer;
+  line-height:1;
+}
+
+/* === menu === */
+#sidebar ul{ list-style:none; margin:1.2rem 0; padding:0; flex:1; }
+#sidebar li{ margin:.15rem 0; }
+
+#sidebar a{
+  display:flex; align-items:center; gap:.85rem;
+  padding:.75rem 1.6rem;
+  color:#e4e4e6; font-size:1rem; text-decoration:none;
+  transition:background .25s, color .25s, padding-left .25s;
+  border-left:3px solid transparent;
+}
+#sidebar a svg{ width:22px; height:22px; stroke-width:1.7; }
+
+#sidebar a:hover{
+  background:rgba(10,132,255,.15);
+  color:#fff;
+  padding-left:2rem;
+  border-left:3px solid #0a84ff;
+}
+
+/* === hilangkan underline default link di seluruh halaman === */
+a{ text-decoration:none; }
