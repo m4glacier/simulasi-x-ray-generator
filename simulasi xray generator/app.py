@@ -1,8 +1,9 @@
-# app.py
 import streamlit as st
-import requests, json
+import requests
+import streamlit.components.v1 as components
+import os
 
-BACKEND = "http://localhost:8000"
+# BACKEND = "http://localhost:8000"  # HANYA untuk SSE, sekarang TIDAK dipakai
 
 # Konfigurasi halaman
 st.set_page_config(
@@ -13,9 +14,9 @@ st.set_page_config(
 st.title("Panel Kontrol Simulasi Pesawat Roentgen")
 
 # Inisialisasi session state
-if "kv" not in st.session_state: st.session_state.kv = 00
-if "ma" not in st.session_state: st.session_state.ma = 00
-if "sec" not in st.session_state: st.session_state.sec = 0
+if "kv" not in st.session_state: st.session_state.kv = 0
+if "ma" not in st.session_state: st.session_state.ma = 0
+if "sec" not in st.session_state: st.session_state.sec = 1
 if "sent_payload" not in st.session_state: st.session_state.sent_payload = {}
 
 # === Bagian Atas: Kontrol Parameter ===
@@ -43,30 +44,15 @@ with col3:
 
 # Tombol reset
 if st.button("🔄 RESET"):
-    st.session_state.kv = 00
-    st.session_state.ma = 00
-    st.session_state.sec = 0
+    st.session_state.kv = 0
+    st.session_state.ma = 0
+    st.session_state.sec = 1
 
 # Status
 st.subheader("Kontrol Paparan")
 kode = st.radio("Status", ["OFF", "PRE", "ON"], horizontal=True)
 
-# Payload dikirim ke backend
-payload = {
-    "kv": st.session_state.kv,
-    "mA": st.session_state.ma,
-    "Sec": st.session_state.sec,
-    "kode": "e" if kode == "ON" else "p" if kode == "PRE" else "x"
-}
-
-if payload != st.session_state.sent_payload:
-    try:
-        requests.post(f"{BACKEND}/update", json=payload, timeout=0.2)
-        st.session_state.sent_payload = payload
-    except requests.exceptions.RequestException:
-        st.warning("⚠️ Flask server belum aktif di port 8000")
-
-# Info nilai parameter
+# Tampilkan nilai parameter
 st.markdown("---")
 st.markdown(f"""
 **Tegangan:** {st.session_state.kv} kV  
@@ -77,8 +63,19 @@ st.markdown(f"""
 
 # === Bagian Bawah: Simulasi ===
 st.subheader("Simulasi Pesawat Roentgen")
-st.markdown(f"""
-<iframe src="{BACKEND}/web/index.html"
-        width="100%" height="800" frameborder="0"
-        style="background:#000;"></iframe>
-""", unsafe_allow_html=True)
+
+try:
+    html_path = os.path.join("web", "index.html")
+    with open(html_path, "r", encoding="utf-8") as f:
+        html_content = f.read()
+
+        # Sisipkan nilai-nilai parameter ke dalam HTML
+        html_content = html_content.replace("{{kv}}", str(st.session_state.kv))
+        html_content = html_content.replace("{{ma}}", str(st.session_state.ma))
+        html_content = html_content.replace("{{sec}}", str(st.session_state.sec))
+        html_content = html_content.replace("{{kode}}", kode.lower())
+
+        components.html(html_content, height=800, scrolling=True)
+
+except FileNotFoundError:
+    st.error("⚠️ File `web/index.html` tidak ditemukan.")
